@@ -1,0 +1,18 @@
+version: '3'
+services:
+  bothelp_rabbitmq:
+    image: "bitnami/rabbitmq"
+    environment:
+      RABBITMQ_USERNAME: "user"
+      RABBITMQ_PASSWORD: "user"
+      RABBITMQ_PLUGINS: "rabbitmq_management,rabbitmq_management_agent,rabbitmq_shovel,rabbitmq_prometheus, rabbitmq_web_dispatch"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+      - "15692:15692"
+    volumes:
+      - 'bothel_prabbitmq_data:/bitnami'
+
+volumes:
+  bothel_prabbitmq_data:
+    driver: local
