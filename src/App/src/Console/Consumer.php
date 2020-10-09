@@ -37,6 +37,7 @@ class Consumer extends Command
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $this->output = $output;
+        $this->installSignalsHandler();
         $connection = $this->rabbit->newConnect();
         $channel = $connection->channel();
         $this->declareQueues($channel);
@@ -87,6 +88,9 @@ class Consumer extends Command
         while ($channel->is_consuming() && $this->isWorking) {
             $channel->wait();
         }
+
+        $channel->close();
+        $connection->close();
     }
 
     private function work(string $queueName)
@@ -108,5 +112,21 @@ class Consumer extends Command
         while ($channel->is_consuming() && $this->isWorking) {
             $channel->wait();
         }
+
+        $channel->close();
+        $connection->close();
+    }
+
+    private function installSignalsHandler()
+    {
+        pcntl_signal(SIGTERM, [$this, 'sigHandler']);
+        pcntl_signal(SIGHUP,  [$this, 'sigHandler']);
+        pcntl_signal(SIGINT, [$this, 'sigHandler']);
+    }
+
+    public function sigHandler($signo)
+    {
+        $this->output->writeln("Receive signal " . $signo);
+        $this->isWorking = false;
     }
 }
