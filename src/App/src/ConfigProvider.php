@@ -44,7 +44,7 @@ class ConfigProvider
     {
         return [
             'connection' => [
-                'host' => '127.0.0.1',
+                'host' => 'bothelp_rabbitmq',
                 'port' => 5672,
                 'user' => 'user',
                 'password' => 'user',

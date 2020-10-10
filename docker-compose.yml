@@ -12,7 +12,18 @@ services:
       - "15692:15692"
     volumes:
       - 'bothel_prabbitmq_data:/bitnami'
+  bothelp_php_cli:
+    build:
+      context: ./docker/development
+      dockerfile: php-cli.docker
+    volumes:
+      - .:/app
+      - composer:/root/.composer/cache
+    depends_on:
+      - bothelp_rabbitmq
 
 volumes:
   bothel_prabbitmq_data:
+    driver: local
+  composer:
     driver: local

@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Consumer extends Command
 {
-    const WORKER_COUNT = 20;
+    const WORKER_COUNT = 100;
     const BASE_QUEUE_NAME = 'events';
 
     private $rabbit;
