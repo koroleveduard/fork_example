@@ -6,6 +6,7 @@ namespace App;
 
 use App\Console\Consumer;
 use App\Console\Producer;
+use App\Factory\Console\ConsumerFactory;
 use App\Factory\Service\RabbitMqServiceFactory;
 use App\Service\RabbitMqService;
 
@@ -26,6 +27,7 @@ class ConfigProvider
             'invokables' => [],
             'factories'  => [
                 RabbitMqService::class => RabbitMqServiceFactory::class,
+                Consumer::class => ConsumerFactory::class,
             ],
         ];
     }

@@ -13,17 +13,18 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Consumer extends Command
 {
-    const WORKER_COUNT = 100;
     const BASE_QUEUE_NAME = 'events';
 
     private $rabbit;
     private $isWorking;
     /** @var OutputInterface */
     private $output;
+    private $workerCount;
 
-    public function __construct(RabbitMqService $rabbit)
+    public function __construct(RabbitMqService $rabbit, int $workerCount)
     {
         $this->rabbit = $rabbit;
+        $this->workerCount = $workerCount;
         parent::__construct(null);
     }
 
@@ -45,7 +46,7 @@ class Consumer extends Command
         $channel->close();
 
         $queueName = null;
-        for ($i=0; $i < self::WORKER_COUNT; $i++) {
+        for ($i=0; $i < $this->workerCount; $i++) {
             $queueName = self::BASE_QUEUE_NAME . '_' . $i;
             $pid = pcntl_fork();
             if ($pid == 0) break;
@@ -62,7 +63,7 @@ class Consumer extends Command
 
     private function declareQueues(AMQPChannel $channel)
     {
-        for ($i=0; $i < self::WORKER_COUNT; $i++) {
+        for ($i=0; $i < $this->workerCount; $i++) {
             $queueName = self::BASE_QUEUE_NAME . '_' . $i;
             $channel->queue_declare($queueName, false, true, false, false);
         }
@@ -75,7 +76,7 @@ class Consumer extends Command
         $callback = function (AMQPMessage $msg) use ($channel) {
             $payload = json_decode($msg->body, true);
             $accountId = $payload['account_id'];
-            $numberQueue = $accountId % self::WORKER_COUNT;
+            $numberQueue = $accountId % $this->workerCount;
             $queueName = self::BASE_QUEUE_NAME . '_' . $numberQueue;
 
             $msg = new AMQPMessage(json_encode($payload), ['delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT]);
